@@ -1,0 +1,5 @@
+- [x] Setup typescript, redis, express and prisma client
+- [x] Prisma User models
+- [ ] Passport.js Google oauth2
+- [ ] Passport.js  local strategy
+- [ ] Request body validation
