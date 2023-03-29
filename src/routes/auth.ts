@@ -3,7 +3,7 @@ import passport from "passport";
 import { UserData } from "src/config/passport";
 import prisma from "../config/prisma";
 import bcrypt from "bcrypt";
-
+const CLIENT_URL = "http://localhost:3000/";
 const router = Router();
 
 router.post('/login', async function (req: Request, res: Response, next: NextFunction) {
@@ -17,11 +17,38 @@ router.post('/login', async function (req: Request, res: Response, next: NextFun
     })(req, res, next);
 })
 
-router.post('/logout', async function (req: Request, res: Response, next: NextFunction) {
-    req.logout(function (err) {
-        if (err) return next(err)
-    });
-    res.redirect("/");
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get(
+    "/google/callback",
+    (req, res, next) => {
+        passport.authenticate("google", async (error: Error, user: UserData, info: { message: string }) => {
+            try {
+                if (error) { return next(error.message); }
+                if (!user) {
+                    res.status(401);
+                    res.send(`<h1>${info.message}</h1>`);
+                    return;
+                }
+                req.login(user, function (err) {
+                    if (err) { return next(err); }
+                    return res.redirect(CLIENT_URL)
+                });
+            } catch (error) {
+                return res.json({ success: false, msg: error })
+            }
+        })(req, res, next)
+    }
+);
+router.get('/logout', async function (req: Request, res: Response, next: NextFunction) {
+    try {
+        req.logout((err) => {
+            if (err) { return res.status(500).json({ success: false }) }
+            return res.json({ success: true })
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: true })
+    }
 })
 
 router.post('/register', async function (req: Request, res: Response, next: NextFunction) {
@@ -68,7 +95,17 @@ router.post('/register', async function (req: Request, res: Response, next: Next
         console.log(error);
     }
 })
-
+router.get("/login/failed", (req, res, next) => {
+    return res.json({ message: "Error while logging", success: false })
+});
+router.get("/login/success", (req, res) => {
+    if (req.user) {
+        return res.status(200).json({
+            success: true,
+            user: req.user,
+        });
+    }
+});
 export default router;
 
 

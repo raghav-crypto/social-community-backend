@@ -5,6 +5,7 @@ import session from 'express-session'
 import RedisStore from "connect-redis"
 import Redis from 'ioredis'
 import "./config/passport";
+import cors from "cors";
 
 function buildApp(): express.Application {
     const app = express();
@@ -12,6 +13,13 @@ function buildApp(): express.Application {
     const redisStore = new RedisStore({
         client: redis
     })
+
+    app.use(cors({
+        origin: "http://localhost:3000",
+        methods: "GET,POST,PUT,DELETE",
+        credentials: true,
+
+    }))
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
 
@@ -20,7 +28,7 @@ function buildApp(): express.Application {
             name: 'qid',
             store: redisStore,
             saveUninitialized: false, // recommended: only save session when data exists
-            secret: process.env.REDIS_SECRET,
+            secret: process.env.REDIS_SECRET!,
             cookie: {
                 // secure: true, // cookie only works in https
                 httpOnly: true,
