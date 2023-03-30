@@ -2,4 +2,6 @@
 - [x] Prisma User models
 - [x] Passport.js  local strategy
 - [x] Passport.js Google oauth2
+- [x] Custom ErrorResponse middleware.
+- [ ] Authentication Middleware for Auth and Admin routes.
 - [ ] Request body validation

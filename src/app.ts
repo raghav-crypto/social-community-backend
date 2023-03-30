@@ -6,6 +6,7 @@ import RedisStore from "connect-redis"
 import Redis from 'ioredis'
 import "./config/passport";
 import cors from "cors";
+import ErrorHandler from "./middlewares/error";
 
 function buildApp(): express.Application {
     const app = express();
@@ -43,6 +44,8 @@ function buildApp(): express.Application {
     app.use(passport.session())
 
     addApiRoutes(app);
+
+    app.use(ErrorHandler)
 
     return app;
 }
