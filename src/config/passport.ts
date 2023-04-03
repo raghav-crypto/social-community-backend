@@ -5,23 +5,6 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth2";
 import bcrypt from "bcrypt";
 import { User } from ".prisma/client";
 
-interface GoogleStrategyOptions {
-    clientID: string
-    clientSecret: string
-    callbackURL: string
-}
-export interface UserData {
-    id: string;
-    role: string;
-}
-interface NewUser {
-    firstName?: string;
-    lastName?: string;
-    email: string;
-    image?: string;
-    googleId: string;
-    name: string;
-}
 passport.use(
     new LocalStrategy(
         { usernameField: 'identifier', passwordField: 'password' },
@@ -43,7 +26,7 @@ passport.use(
         }
     )
 );
-const Options: GoogleStrategyOptions = {
+const Options: SocialTypes.GoogleStrategyOptions = {
     clientID: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     callbackURL: '/auth/google/callback'
@@ -59,7 +42,7 @@ passport.use(new GoogleStrategy(Options, async function (accessToken, refreshTok
             done(null, { id: User.id, role: User.role })
         } else {
 
-            let userData: NewUser = {
+            let userData: SocialTypes.NewUser = {
                 email: "",
                 googleId: profile.id,
                 name: profile.displayName,
@@ -80,11 +63,11 @@ passport.use(new GoogleStrategy(Options, async function (accessToken, refreshTok
     }
 }))
 
-passport.serializeUser<UserData, any>((userData: UserData, done: any) => {
+passport.serializeUser<SocialTypes.UserData, any>((userData: SocialTypes.UserData, done: any) => {
     done(null, userData);
 });
 
-passport.deserializeUser(async (userData: UserData, done: any) => {
+passport.deserializeUser(async (userData: SocialTypes.UserData, done: any) => {
     try {
         const user = await prisma.user.findUnique({
             where: { id: userData.id },
