@@ -8,17 +8,115 @@ datasource db {
 }
 
 model User {
-  id        String   @id @unique @default(uuid())
+  id           String         @id @unique @default(uuid())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  email        String         @unique
+  password     String?
+  name         String?
+  role         Role           @default(USER)
+  googleId     String?
+  firstName    String?
+  lastName     String?
+  image        String?
+  questions    Question[]
+  questionVote QuestionVote[]
+  answer       Answer[]
+  answerVote   AnswerVote[]
+
+  @@index([id])
+}
+
+model Categories {
+  id        String     @id @default(uuid())
+  name      String
+  questions Question[] @relation("QuestionCategory")
+}
+
+model Question {
+  id    String @id @default(uuid())
+  title String
+  body  String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  categories Categories[] @relation("QuestionCategory")
+
+  answers Answer[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email     String   @unique
-  password  String?
-  name      String?
-  role      Role     @default(USER)
-  googleId  String?
-  firstName String?
-  lastName  String?
-  image     String?
+
+  questionVote QuestionVote[]
+
+  upvotes   Int @default(0)
+  downvotes Int @default(0)
+
+  netVotes   Int          @default(0)
+  answerVote AnswerVote[]
+
+  @@index([id, netVotes])
+}
+
+model QuestionVote {
+  id     String @id @default(uuid())
+  value  Int    @default(1) // 1 -> upvote and -1 -> downvote
+  // value  Boolean @default(true) // true -> upvote and false -> downvote
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id])
+}
+
+model Answer {
+  id   String @id @default(uuid())
+  body String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parentAnswer   Answer? @relation("ChildAnswers", fields: [parentAnswerId], references: [id])
+  parentAnswerId String?
+
+  childAnswers Answer[] @relation("ChildAnswers")
+
+  upvotes    Int          @default(0)
+  downvotes  Int          @default(0)
+  netVotes   Int          @default(0)
+  deleted    Boolean      @default(false)
+  AnswerVote AnswerVote[]
+
+  @@index([id, netVotes])
+}
+
+model AnswerVote {
+  id     String @id @default(uuid())
+  value  Int    @default(1) // 1 -> upvote and -1 -> downvote
+  // value  Boolean @default(true) // true -> upvote and false -> downvote
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  answer   Answer @relation(fields: [answerId], references: [id])
+  answerId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([id])
 }

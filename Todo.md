@@ -3,5 +3,6 @@
 - [x] Passport.js  local strategy
 - [x] Passport.js Google oauth2
 - [x] Custom ErrorResponse middleware.
-- [ ] Authentication Middleware for Auth and Admin routes.
+- [x] Authentication Middleware for Auth and Admin routes.
+- [x] Question CRUD
 - [ ] Request body validation

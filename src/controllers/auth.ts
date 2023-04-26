@@ -1,14 +1,14 @@
 import { NextFunction, Response, Request } from "express";
 import prisma from "../config/prisma";
-import { SocialTypes } from "src/types/types";
+import { SocialTypes } from "../types/index";
 
 const ErrorResponse = require("../utils/ErrorResponse");
 const passport = require("passport");
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const CLIENT_URL = "localhost:3000"
 
 export async function register(req: Request, res: Response, next: NextFunction) {
-    const { email, name, password, firstName, lastName } = req.body;
+    const { email, name, password, firstName, lastName, role } = req.body;
     const doesExist = await prisma.user.findMany({
         where: {
             OR: [
@@ -27,16 +27,16 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     if (doesExist.length) {
         return res.json({ success: false, message: "User name/email taken" })
     }
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const User = await prisma.user.create({
         data: {
             email,
             firstName,
             lastName,
             name,
-            // password: hashedPassword
-            password
+            password: hashedPassword,
+            role: role || "USER"
         }
     })
     return req.login({ id: User.id, role: User.role }, function (err) {
