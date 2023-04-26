@@ -5,4 +5,5 @@
 - [x] Custom ErrorResponse middleware.
 - [x] Authentication Middleware for Auth and Admin routes.
 - [x] Question CRUD
-- [ ] Request body validation
+- [x] Request body validation
+- [ ] Upvote Downvote

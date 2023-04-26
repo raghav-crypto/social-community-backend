@@ -25,7 +25,7 @@ export async function getQuestions(req: Request, res: Response, next: NextFuncti
     try {
         const questions = await prisma.question.findMany({
         })
-        return res.json(questions)
+        res.json({ success: true, data: questions })
     }
     catch (error) {
         next(error)
@@ -35,6 +35,13 @@ export async function getQuestions(req: Request, res: Response, next: NextFuncti
 export async function updateQuestion(req: Request, res: Response, next: NextFunction) {
     try {
         const { id, body, title } = req.body;
+        const exist = await prisma.question.findUnique({
+            where: {
+                id
+            }
+        })
+        if (!exist) return next(new ErrorResponse("Question not found", 404))
+        if (exist.authorId !== req.user?.id) return next(new ErrorResponse("You are not authorized to update this question", 401))
         const question = await prisma.question.update({
             where: {
                 id
@@ -44,7 +51,7 @@ export async function updateQuestion(req: Request, res: Response, next: NextFunc
                 title
             }
         })
-        res.json(question)
+        res.json({ success: true, data: question })
     } catch (error) {
         next(error)
     }
@@ -58,6 +65,7 @@ export async function deleteQuestion(req: Request, res: Response, next: NextFunc
             }
         })
         if (!exist) return next(new ErrorResponse("Question not found", 404))
+        if (exist.authorId !== req.user?.id) return next(new ErrorResponse("You are not authorized to delete this question", 401))
         await prisma.question.delete({
             where: {
                 id
