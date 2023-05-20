@@ -5,21 +5,19 @@ import { validateBody } from "../middlewares/validate";
 import { createQuestion, updateQuestion } from "../utils/validatingSchema";
 const router = Router();
 
-router.post('/',
-    isAuth,
-    validateBody(createQuestion),
-    QuestionController.createQuestion
-)
-router.get('/',
-    QuestionController.getQuestions
-)
-router.put('/',
-    isAuth,
-    validateBody(updateQuestion),
-    QuestionController.updateQuestion
-)
-router.delete('/:id',
-    isAuth,
-    QuestionController.deleteQuestion
-)
+router.post(
+  "/",
+  isAuth,
+  validateBody(createQuestion),
+  QuestionController.createQuestion
+);
+router.get("/", QuestionController.getQuestions);
+router.put(
+  "/",
+  isAuth,
+  validateBody(updateQuestion),
+  QuestionController.updateQuestion
+);
+router.delete("/:id", isAuth, QuestionController.deleteQuestion);
+router.put("/vote/:questionId", isAuth, QuestionController.upvoteQuestion);
 export default router;
