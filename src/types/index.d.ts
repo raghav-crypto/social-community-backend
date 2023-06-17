@@ -26,4 +26,7 @@ declare global {
             role: string;
         }
     }
+    interface SocialRequest extends Request {
+        select?: Record<string, any>;
+    }
 }
