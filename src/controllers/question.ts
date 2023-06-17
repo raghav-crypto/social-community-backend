@@ -26,17 +26,49 @@ export async function createQuestion(
   }
 }
 export async function getQuestions(
-  req: Request,
+  req: SocialRequest,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const questions = await prisma.question.findMany({});
-    res.json({ success: true, data: questions });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const questions = await prisma.question.findMany({
+      select: {
+        ...req.select,
+        upvotes: true,
+        downvotes: true,
+        netVotes: true,
+        _count: {
+          select: {
+            answers: true,
+          },
+        },
+      },
+      orderBy: {
+        netVotes: "desc",
+      },
+    });
+    const totalCount = await questions.length;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const response = {
+      data: questions,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        totalPages,
+        totalCount,
+      },
+    };
+    res.json({ success: true, data: response });
   } catch (error) {
     next(error);
   }
 }
+
+
 export async function updateQuestion(
   req: Request,
   res: Response,
