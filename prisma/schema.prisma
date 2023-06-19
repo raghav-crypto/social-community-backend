@@ -3,17 +3,53 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
+model Profile {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @db.ObjectId
+  bio        String?
+  location   String?
+  website    String?
+  avatar     String?
+  background String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Skill {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+  name      String
+  level     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id])
+}
+
+model Interest {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id])
+}
+
 model User {
-  id           String         @id @unique @default(uuid())
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   email        String         @unique
   password     String?
-  name         String?
+  name         String?        @unique
   role         Role           @default(USER)
   googleId     String?
   firstName    String?
@@ -23,27 +59,34 @@ model User {
   questionVote QuestionVote[]
   answer       Answer[]
   answerVote   AnswerVote[]
+  // collaborationListingRequest CollaborationListingRequest[]
+  profile      Profile[]
+  skill        Skill[]
+  interest     Interest[]
 
-  @@index([id])
+  @@index([id, email, name])
 }
 
 model Categories {
-  id        String     @id @default(uuid())
-  name      String
-  questions Question[] @relation("QuestionCategory")
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  questionIDs String[]   @db.ObjectId
+  questions   Question[] @relation(fields: [questionIDs], references: [id])
+
+  @@index([name])
 }
 
 model Question {
-  id    String @id @default(uuid())
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
   title String
   body  String
 
   author   User   @relation(fields: [authorId], references: [id])
-  authorId String
+  authorId String @db.ObjectId
 
-  categories Categories[] @relation("QuestionCategory")
-
-  answers Answer[]
+  categories  Categories[] @relation(fields: [categoryIDs], references: [id])
+  categoryIDs String[]     @db.ObjectId
+  answers     Answer[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,14 +103,14 @@ model Question {
 }
 
 model QuestionVote {
-  id     String @id @default(uuid())
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
   value  Int    @default(1) // 1 -> upvote and -1 -> downvote
   // value  Boolean @default(true) // true -> upvote and false -> downvote
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @db.ObjectId
 
   question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  questionId String   @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,22 +119,23 @@ model QuestionVote {
 }
 
 model Answer {
-  id   String @id @default(uuid())
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
   body String
 
   author   User   @relation(fields: [authorId], references: [id])
-  authorId String
+  authorId String @db.ObjectId
 
   question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  questionId String   @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  parentAnswer   Answer? @relation("ChildAnswers", fields: [parentAnswerId], references: [id])
-  parentAnswerId String?
+  parentAnswer   Answer?  @relation("ChildAnswers", fields: [parentAnswerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentAnswers  Answer[] @relation("ChildAnswers")
+  parentAnswerId String?  @db.ObjectId
 
-  childAnswers Answer[] @relation("ChildAnswers")
+  // childAnswers Answer[] @relation("ChildAnswers")
 
   upvotes    Int          @default(0)
   downvotes  Int          @default(0)
@@ -103,17 +147,16 @@ model Answer {
 }
 
 model AnswerVote {
-  id     String @id @default(uuid())
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
   value  Int    @default(1) // 1 -> upvote and -1 -> downvote
-  // value  Boolean @default(true) // true -> upvote and false -> downvote
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @db.ObjectId
 
   question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  questionId String   @db.ObjectId
 
   answer   Answer @relation(fields: [answerId], references: [id])
-  answerId String
+  answerId String @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

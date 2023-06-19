@@ -10,7 +10,10 @@ import ErrorHandler from "./middlewares/error";
 
 function buildApp(): express.Application {
     const app = express();
-    const redis = new Redis();
+    const redis = new Redis({
+        port: 6379,
+        host: process.env.REDIS_HOST,
+    });
     const redisStore = new RedisStore({
         client: redis
     })

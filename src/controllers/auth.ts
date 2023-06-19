@@ -2,9 +2,9 @@ import { NextFunction, Response, Request } from "express";
 import prisma from "../config/prisma";
 import { SocialTypes } from "../types/index";
 
-const ErrorResponse = require("../utils/ErrorResponse");
-const passport = require("passport");
-const bcrypt = require("bcrypt");
+import ErrorResponse from "../utils/ErrorResponse";
+import passport from "passport";
+import bcrypt from "bcrypt";
 const CLIENT_URL = "localhost:3000";
 
 export async function register(
@@ -75,7 +75,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         return next(err);
       }
       if (!user) {
-        return next(new ErrorResponse(info.message, "login", 404));
+        return next(new ErrorResponse(info.message, 404, "login"));
       }
       return req.login(user, function (err) {
         if (err) {
@@ -130,7 +130,7 @@ export async function loginFailed(
   res: Response,
   next: NextFunction
 ) {
-  return next(new ErrorResponse("Error while logging", "login", 401));
+  return next(new ErrorResponse("Error while logging", 401, "login"));
 }
 export async function loginSuccess(
   req: Request,
@@ -143,7 +143,7 @@ export async function loginSuccess(
       user: req.user,
     });
   }
-  return next(new ErrorResponse("Error while logging", "login", 401));
+  return next(new ErrorResponse("Error while logging", 401, "login"));
 }
 export async function me(req: Request, res: Response, next: NextFunction) {
   const User = await prisma.user.findUnique({
@@ -152,7 +152,7 @@ export async function me(req: Request, res: Response, next: NextFunction) {
     },
   });
   if (!User) {
-    return next(new ErrorResponse("User not found", "me", 404));
+    return next(new ErrorResponse("User not found", 404, "me"));
   }
   return res.json({ data: User });
 }
