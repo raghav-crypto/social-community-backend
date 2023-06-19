@@ -1,6 +1,6 @@
 import prisma from "../config/prisma";
 import { Request, Response, NextFunction } from "express";
-import ErrorResponse from "../utils/ErrorResponse";
+import ErrorResponse from "../utils/errorResponse";
 
 export async function createQuestion(
   req: Request,

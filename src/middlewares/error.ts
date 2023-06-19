@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Request, Response, NextFunction } from "express";
-import ErrorResponse from "../utils/ErrorResponse";
+import ErrorResponse from "../utils/errorResponse";
 
 async function Errorhandler(err: ErrorResponse, _req: Request, res: Response, _next: NextFunction) {
     console.log(err);

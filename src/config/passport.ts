@@ -32,7 +32,7 @@ const Options: SocialTypes.GoogleStrategyOptions = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     callbackURL: '/auth/google/callback'
 }
-passport.use(new GoogleStrategy(Options, async function (accessToken, refreshToken, profile, done) {
+passport.use(new GoogleStrategy(Options, async function (_accessToken, _refreshToken, profile, done) {
 
     const name = profile.displayName.split(" ")
     const firstName = name[0];

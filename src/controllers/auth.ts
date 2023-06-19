@@ -2,7 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import prisma from "../config/prisma";
 import { SocialTypes } from "../types/index";
 
-import ErrorResponse from "../utils/ErrorResponse";
+import ErrorResponse from "../utils/errorResponse";
 import passport from "passport";
 import bcrypt from "bcrypt";
 const CLIENT_URL = "localhost:3000";
@@ -10,7 +10,7 @@ const CLIENT_URL = "localhost:3000";
 export async function register(
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
   const { email, name, password, firstName, lastName, role } = req.body;
   const doesExist = await prisma.user.findMany({
@@ -87,7 +87,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   )(req, res, next);
 }
 
-export async function google(req: Request, res: Response, next: NextFunction) {
+export async function google(_req: Request, _res: Response, _next: NextFunction) {
   return passport.authenticate("google", { scope: ["profile", "email"] });
 }
 
@@ -126,8 +126,8 @@ export async function googleCallback(
 }
 
 export async function loginFailed(
-  req: Request,
-  res: Response,
+  _req: Request,
+  _res: Response,
   next: NextFunction
 ) {
   return next(new ErrorResponse("Error while logging", 401, "login"));
