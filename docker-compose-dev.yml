@@ -1,0 +1,14 @@
+services:
+  nginx:
+    ports:
+      - "5000:80"
+  social:
+    build:
+      context: .
+      args:
+        NODE_ENV: "docker"
+    volumes:
+      # - ./:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV="docker"
