@@ -26,7 +26,7 @@ export async function createQuestion(
   }
 }
 export async function getQuestions(
-  req: SocialRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {

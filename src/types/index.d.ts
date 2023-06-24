@@ -1,6 +1,16 @@
-import { Request } from "express";
+type ExpressRequest = import("express").Request;
 
-declare namespace SocialTypes {
+interface User {
+    id: string;
+    role: string;
+}
+declare module 'express' {
+    interface Request {
+        user: User;
+        select?: Record<string, any>;
+    }
+}
+export declare namespace SocialTypes {
     interface GoogleStrategyOptions {
         clientID: string
         clientSecret: string
@@ -17,16 +27,5 @@ declare namespace SocialTypes {
         image?: string;
         googleId: string;
         name: string;
-    }
-}
-declare global {
-    namespace Express {
-        export interface User {
-            id: string;
-            role: string;
-        }
-    }
-    interface SocialRequest extends Request {
-        select?: Record<string, any>;
     }
 }

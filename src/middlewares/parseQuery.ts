@@ -1,11 +1,11 @@
-import { Response, NextFunction } from "express";
+import { Response, NextFunction, Request } from "express";
 import ErrorResponse from "../utils/errorResponse";
 
 const selectFields = (
   allowedFields: Record<string, string[]>,
   tableName: string
 ) => {
-  return (req: SocialRequest, _res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.query.select) {
       req.select = { id: true };
       return next();
