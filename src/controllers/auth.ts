@@ -10,7 +10,7 @@ const CLIENT_URL = "localhost:3000";
 export async function register(
   req: Request,
   res: Response,
-  _next: NextFunction
+  next: NextFunction
 ) {
   const { email, name, password, firstName, lastName, role } = req.body;
   const doesExist = await prisma.user.findMany({
@@ -29,7 +29,7 @@ export async function register(
     },
   });
   if (doesExist.length) {
-    return res.json({ success: false, message: "User name/email taken" });
+    return next(new ErrorResponse("User name/email taken", 409, "register"))
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -43,18 +43,18 @@ export async function register(
       role: role || "USER",
     },
   });
-  return req.login({ id: User.id, role: User.role }, function (err) {
+  return req.login({ id: User.id, role: User.role }, function (err: Error) {
     if (err) {
-      return res.json({ message: err, success: false });
+      return next(new ErrorResponse("Error while logging in", 400, "login"))
     }
     return res.json({ success: true });
   });
 }
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
-    req.logout((err) => {
+    req.logout((err: Error) => {
       if (err) {
-        return res.status(500).json({ success: false });
+        return next(new ErrorResponse("Error while logging out", 400, "logout"))
       }
       return res.json({ success: true });
     });
@@ -79,7 +79,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       }
       return req.login(user, function (err) {
         if (err) {
-          return res.json({ message: err, success: false });
+          return next(new ErrorResponse("Error while logging", 401, "login"));
         }
         return res.json({ success: true });
       });
@@ -119,7 +119,7 @@ export async function googleCallback(
           return res.redirect(CLIENT_URL);
         });
       } catch (error) {
-        return res.json({ success: false, msg: error });
+        return next(new ErrorResponse("Error while logging", 401, "login"));
       }
     }
   )(req, res, next);

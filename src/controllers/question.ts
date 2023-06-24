@@ -199,7 +199,7 @@ export async function upvoteQuestion(
             return { success: true, message: "Upvoted!" };
           } catch (error) {
             console.log(error);
-            return { success: false, message: "Something went wrong" };
+            return { success: false, message: "Unable to vote" };
           }
         }
       } else {
@@ -225,7 +225,7 @@ export async function upvoteQuestion(
           return { success: true, message: "Upvoted!" };
         } catch (error) {
           console.log(error);
-          return { success: false, message: "Something went wrong" };
+          return { success: false, message: "Unable to vote" };
         }
       }
     });
