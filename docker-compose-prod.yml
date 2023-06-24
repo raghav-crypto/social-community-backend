@@ -1,0 +1,18 @@
+services:
+  nginx:
+    ports:
+      - "5000:80"
+
+  social:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    environment:
+      - NODE_ENV=production
+    command: npm start
+
+  mongo:
+    env_file:
+      - mongo.env
