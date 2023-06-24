@@ -1,21 +1,27 @@
-FROM node:16.16.0-alpine
+FROM node:16-alpine AS builder
+
 WORKDIR /app
 COPY package.json .
 COPY ./prisma prisma
 
-ARG NODE_ENV
-RUN if [ $NODE_ENV = "docker" ]; \
-    then npm install; \
-    else npm install --only=production; \
-    fi
-
-COPY . ./
-
+COPY . .
+RUN npm install
+RUN npx prisma generate
 RUN npm run build
 COPY ./.env ./build/
 
-WORKDIR ./build
-ENV PORT 5000
-EXPOSE $PORT
+FROM node:16-alpine AS final
+WORKDIR /app
+COPY ./prisma prisma
+COPY ./nginx nginx
+COPY --from=builder ./app/build ./build
+COPY package.json .
+# RUN npm install --omit=dev
 
-CMD ["node", "server.js"]
+# ARG NODE_ENV
+# RUN if [ "$NODE_ENV" = "docker" ]; \
+#     then npm install -g nodemon && \
+#     npm install -g ts-node-dev; \
+#     fi
+
+RUN npm install dotenv

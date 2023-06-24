@@ -8,7 +8,8 @@ services:
       args:
         NODE_ENV: "docker"
     volumes:
-      # - ./:/app
+      - ./:/app
       - /app/node_modules
     environment:
       - NODE_ENV="docker"
+    command: npm run dev
