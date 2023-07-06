@@ -20,8 +20,38 @@ export async function createAnswer(req: Request, res: Response, next: NextFuncti
 }
 export async function getAnswers(req: Request, res: Response, next: NextFunction) {
     try {
-        const answers = await prisma.answer.findMany({})
-        return res.json({ data: answers, success: true })
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const answers = await prisma.answer.findMany({
+            where: {
+                parentAnswer: null,
+                deleted: false,
+                questionId: req.params.questionId
+            },
+            select: {
+                ...req.select,
+                upvotes: true,
+                downvotes: true,
+                netVotes: true,
+            },
+            orderBy: {
+                netVotes: "desc"
+            },
+            skip: (page - 1) * limit,
+            take: limit,
+        })
+        const totalCount = await answers.length;
+        const totalPages = Math.ceil(totalCount / limit);
+        const response = {
+            data: answers,
+            pagination: {
+                page: Number(page),
+                limit: Number(limit),
+                totalPages,
+                totalCount,
+            },
+        };
+        return res.json({ data: response, success: true })
     } catch (error) {
         next(error)
     }

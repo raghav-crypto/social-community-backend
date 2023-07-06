@@ -33,7 +33,6 @@ export async function getQuestions(
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-
     const questions = await prisma.question.findMany({
       select: {
         ...req.select,
@@ -46,9 +45,12 @@ export async function getQuestions(
           },
         },
       },
+      skip: (page - 1) * limit,
+      take: limit,
       orderBy: {
         netVotes: "desc",
       },
+
     });
     const totalCount = await questions.length;
     const totalPages = Math.ceil(totalCount / limit);

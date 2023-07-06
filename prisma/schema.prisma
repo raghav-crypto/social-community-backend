@@ -131,11 +131,10 @@ model Answer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  parentAnswer   Answer?  @relation("ChildAnswers", fields: [parentAnswerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  parentAnswers  Answer[] @relation("ChildAnswers")
-  parentAnswerId String?  @db.ObjectId
+  parentAnswer   Answer? @relation("ChildAnswers", fields: [parentAnswerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentAnswerId String? @db.ObjectId
 
-  // childAnswers Answer[] @relation("ChildAnswers")
+  childAnswers Answer[] @relation("ChildAnswers")
 
   upvotes    Int          @default(0)
   downvotes  Int          @default(0)
