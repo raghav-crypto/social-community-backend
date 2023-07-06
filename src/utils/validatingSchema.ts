@@ -26,3 +26,9 @@ export const updateQuestion = joi.object({
     body: joi.string().min(2),
     id: joi.string().uuid().required().empty(),
 })
+export const createAnswer = joi.object({
+    body: joi.string().min(2).required(),
+})
+export const updateAnswer = joi.object({
+    body: joi.string().min(2),
+})

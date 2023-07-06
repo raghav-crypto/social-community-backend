@@ -1,11 +1,13 @@
 const APP_START_TIME: number = Date.now();
 import auth from "./auth";
-import question from "./question";
+import questions from "./question";
+import answers from "./answers";
 import { Application, Request, Response, Router } from "express";
 
 const API_ROUTE_MAP: { [key: string]: Router } = {
     "/auth": auth,
-    "/question": question,
+    "/question": questions,
+    "/answer": answers,
 }
 
 function addApiRoutes(app: Application): void {
